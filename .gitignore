@@ -1,0 +1,5 @@
+.fips-*
+CMakeUserPresets.json
+libs/
+code/bgfx/
+code/bx/
