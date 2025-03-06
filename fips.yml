@@ -1,0 +1,7 @@
+# fips project yml file
+---
+
+# external dependencies
+imports:
+    fips-utils:
+        git: https://github.com/fips-libs/fips-utils
