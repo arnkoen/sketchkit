@@ -1,4 +1,9 @@
+//Copyright (c) 2025 Arne Koenig
+//Redistribution and use in source and binary forms, with or without modification, are permitted.
+//THIS SOFTWARE IS PROVIDED 'AS-IS', WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE OF THIS SOFTWARE. 
+
 #include "sk.h"
+#include "platform.h"
 #define QOI_IMPLEMENTATION
 #include "qoi.h"
 #define M3D_IMPLEMENTATION
@@ -18,11 +23,18 @@ RGFW_window* sk_init(const sk_desc* desc) {
 		RGFW_RECT(20, 20, SK_DEF((i32)desc->width, SK_DEFAULT_WIDTH), SK_DEF((i32)desc->height, SK_DEFAULT_HEIGHT)),
 		SK_DEF(desc->flags, 0)
     );
+    if(!win) {
+        fprintf(stderr, "Failed to create window!");
+        exit(1); 
+    }
 
 	bgfx_init_t init = { 0 };
 	bgfx_init_ctor(&init);
 
-	init.platformData.nwh = win->src.window;
+	init.platformData.nwh = (void*)win->src.window;
+    if(BX_PLATFORM_LINUX == 1) {
+        init.platformData.ndt = (void*)win->src.display;
+    }
 	init.type = SK_DEF(desc->renderer, BGFX_RENDERER_TYPE_COUNT);
 	init.resolution.width = SK_DEF(desc->width, SK_DEFAULT_WIDTH);
 	init.resolution.height = SK_DEF(desc->height, SK_DEFAULT_HEIGHT);

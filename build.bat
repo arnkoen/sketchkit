@@ -1,27 +1,34 @@
-#/bin/bash 2>nul || goto :windows
+#!/bin/bash 2>/dev/null || goto :windows
 
 # -------------------
 # LINUX / MACOS PART
 # -------------------
 
 #!/bin/bash
-set -e
+set -e  # Exit on error
 
-# Check if a main file is provided
-MAIN_FILE=${1:-hello.c}
+# Ensure a main file is provided
+if [ -z "$1" ]; then
+    echo "Error: No input file provided."
+    echo "Usage: ./build <source_file.c> [debug]"
+    exit 1
+fi
+
+MAIN_FILE="$1"
 
 # Choose build type
 if [ "$2" == "debug" ]; then
     CFLAGS="-g -O0 -DDEBUG"
     OUTFILE="${MAIN_FILE%.c}_debug"
 else
-    CFLAGS="-O2 -DNDEBUG"
+    CFLAGS="-O2 -DNDEBUG -s -ffunction-sections -fdata-sections"
     OUTFILE="${MAIN_FILE%.c}"
 fi
 
-# Set library search path (adjust as needed)
+# Set library search path
 LIB_PATH="./libs"
-LDFLAGS="-L$LIB_PATH -lbimg -lbx -lbgfx"
+LDFLAGS="-L$LIB_PATH -lbgfx -lbimg -lbx -ldl -lm -lpthread -lstdc++ -lX11 -lXcursor -lGL -lXi -lXrandr -lvulkan"
+
 
 echo "Building $OUTFILE with main file $MAIN_FILE..."
 
@@ -40,13 +47,14 @@ exit 0
 @echo off
 setlocal enabledelayedexpansion
 
-REM Check if a main file is provided
+REM Ensure a main file is provided
 if "%1"=="" (
-    echo "Please provide an input file!"
-    exit
-) else (
-    set "MAIN_FILE=%1"
+    echo Error: No input file provided.
+    echo Usage: build.bat ^<source_file.c^> [debug]
+    exit /b 1
 )
+
+set "MAIN_FILE=%1"
 
 REM Choose build type
 if "%2"=="debug" (
@@ -69,3 +77,4 @@ if %errorlevel% neq 0 (
 echo Cleaning up unnecessary files...
 del /Q *.obj *.ilk *.pdb *.lib *.exp
 echo Done.
+
