@@ -1,6 +1,6 @@
 # SKETCHKIT
 
-A small utility lib, to quickly make something using bgfx from c.
+A small utility thingie, to quickly make something using bgfx from c.
 It uses RGFW as it windowing backend, HandMadeMath for math operations, qoi.h for image loading and m3d.h for basic model loading.
 
 # Building
