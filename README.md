@@ -4,7 +4,7 @@ A small utility thingie, to quickly make something using bgfx from c.
 It uses RGFW as it windowing backend, HandMadeMath for math operations, qoi.h for image loading and m3d.h for basic model loading.
 
 # Building
-First, you'll need, to build bgfx for your platform and drop the static libraries into the libs/ folder. Then:
+First, you'll need, to build bgfx for your platform, drop the static libraries into the libs/ folder and drop bx/platform.h into the sk/ folder. Then:
 
 - sh ./build.bat <myfile.c> [debug]
 - cd shd
