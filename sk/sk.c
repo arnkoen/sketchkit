@@ -17,6 +17,10 @@
 #define SK_DEFAULT_HEIGHT 600
 #define SK_DEFAULT_TITLE "sketch"
 
+static void _release_fn(void* ptr, void* udata) {
+    free(ptr);
+}
+
 RGFW_window* sk_init(const sk_desc* desc) {
 	RGFW_window* win = RGFW_createWindow(
 		SK_DEF(desc->title, SK_DEFAULT_TITLE),
@@ -32,9 +36,9 @@ RGFW_window* sk_init(const sk_desc* desc) {
 	bgfx_init_ctor(&init);
 
 	init.platformData.nwh = (void*)win->src.window;
-    if(BX_PLATFORM_LINUX == 1) {
-        init.platformData.ndt = (void*)win->src.display;
-    }
+#if !defined _WIN32
+    init.platformData.ndt = (void*)win->src.display;
+ #endif
 	init.type = SK_DEF(desc->renderer, BGFX_RENDERER_TYPE_COUNT);
 	init.resolution.width = SK_DEF(desc->width, SK_DEFAULT_WIDTH);
 	init.resolution.height = SK_DEF(desc->height, SK_DEFAULT_HEIGHT);
@@ -213,18 +217,19 @@ sk_mesh sk_load_m3d(const char* path) {
             indices[outIndex] = outIndex;
         }
     }
+    m3d_free(m3d);
 
     sk_mesh mesh = { 0 };
     bgfx_vertex_layout_t layout = _pnt_layout();
 
     mesh.vbuf = bgfx_create_vertex_buffer(
-        bgfx_make_ref(pnt, total_vertices * sizeof(sk_vertex_pnt)),
+        bgfx_make_ref_release(pnt, total_vertices * sizeof(sk_vertex_pnt), _release_fn, NULL),
         &layout,
         BGFX_BUFFER_NONE
     );
 
     mesh.ibuf = bgfx_create_index_buffer(
-        bgfx_make_ref(indices, total_vertices * sizeof(uint32_t)),
+        bgfx_make_ref_release(indices, total_vertices * sizeof(uint32_t), _release_fn, NULL),
         BGFX_BUFFER_INDEX32
     );
 
